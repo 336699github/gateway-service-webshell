@@ -29,7 +29,7 @@
 <script>
     openTerminal( {
         operate:'connect',
-        host: 'sandbox-hdp.hortonworks.com',
+        host: 'sandbox.hortonworks.com',
         port: '2222',
         username: 'root',
         password: 'Atuan871224'
@@ -52,7 +52,7 @@
             client.sendClientData(data);
         });
         term.open(document.getElementById('terminal'));
-        term.write('Connecting...');
+        term.write('Connecting...\r\n');
         client.connect({
             onError: function (error) {
                 term.write('Error: ' + error + '\r\n');

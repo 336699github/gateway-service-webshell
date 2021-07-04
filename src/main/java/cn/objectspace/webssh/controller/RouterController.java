@@ -17,11 +17,19 @@
  */
 package cn.objectspace.webssh.controller;
 
+import cn.objectspace.webssh.websocket.WebSSHWebSocketHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Controller
 public class RouterController {
     @RequestMapping("/webshellui")
-    public String webshellui(){ return "webssh";}
+    public String webshellui(HttpServletRequest request, HttpServletResponse response){
+        Logger logger = LoggerFactory.getLogger(WebSSHWebSocketHandler.class);
+        //logger.info("request:{}", request.getUserPrincipal().getName());
+        return "webssh";
+    }
 }
