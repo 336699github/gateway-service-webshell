@@ -58,7 +58,7 @@
                 term.write('Error: ' + error + '\r\n');
             },
             onConnect: function () {
-                console.log('connected to websocket');
+                console.log('${username}'+'connected to websocket');
                 client.sendInitData(options);
             },
             onClose: function () {

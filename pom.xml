@@ -32,19 +32,28 @@
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <dependencies>
+        <!-- Web相关 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- jsch支持 -->
+        <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.54</version>
         </dependency>
+        <!-- WebSocket 支持 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
+        <!-- 文件上传解析器 -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -56,6 +65,7 @@
             <version>1.3.3</version>
         </dependency>
     </dependencies>
+    <!--打jar包主清单问题解决-->
     <build>
         <finalName>WebSSH</finalName>
         <plugins>

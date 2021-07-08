@@ -78,7 +78,7 @@ public class WebSSHServiceImpl implements WebSSHService {
             logger.info("received connection request,now ssh into target host");
             SSHConnectInfo sshConnectInfo = (SSHConnectInfo) sshMap.get(userId);
             // start asynchronous execution
-            WebSSHData finalWebSSHData = webSSHData;
+            final WebSSHData finalWebSSHData = webSSHData;
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {

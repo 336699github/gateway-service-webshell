@@ -29,6 +29,8 @@ WSSHClient.prototype._generateEndpoint = function () {
     var endpoint = protocol + '127.0.0.1:4242/webshellws';
     */
     var endpoint = 'wss://localhost:8443/gateway/knoxsso-sandbox/webshellws'
+    //var endpoint = 'wss://localhost:8443/gateway/homepage/webshellws'
+
     return endpoint;
 };
 
