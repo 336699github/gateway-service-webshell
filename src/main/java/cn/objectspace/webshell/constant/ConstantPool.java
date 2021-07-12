@@ -15,25 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webssh.service;
+package cn.objectspace.webshell.constant;
 
-import org.springframework.web.socket.WebSocketSession;
-
-import java.io.IOException;
-
-public interface WebSSHService {
-
-    public void initConnection(WebSocketSession session);
-
-    /**
-     * handle data received from client
-     */
-    public void recvHandle(String buffer, WebSocketSession session);
-
-    /**
-     * send data to frontend through websocket
-     */
-    public void sendMessage(WebSocketSession session, byte[] buffer) throws IOException;
-
-    public void close(WebSocketSession session);
+public class ConstantPool {
+    public static final String OPERATION_CONNECT = "connect";
+    public static final String OPERATION_COMMAND = "command";
 }

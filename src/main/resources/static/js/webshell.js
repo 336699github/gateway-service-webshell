@@ -34,7 +34,7 @@ WSSHClient.prototype._generateEndpoint = function () {
     return endpoint;
 };
 
-WSSHClient.prototype.connect = function (options) {
+WSSHClient.prototype.connect = function (callbackFuncs) {
     var endpoint = this._generateEndpoint();
     console.log('generated endpoint:' + endpoint);
 
@@ -43,24 +43,25 @@ WSSHClient.prototype.connect = function (options) {
         // When new WebSocket(url) is created, it starts connecting immediately
         this._connection = new WebSocket(endpoint);
     }else {
-        options.onError('WebSocket Not Supported');
+        callbackFuncs.onError('WebSocket Not Supported');
         return;
     }
-
+    // The WebSocket.onopen property is an event handler that is called
+    // when the WebSocket connection's readyState changes to 1;
     this._connection.onopen = function () {
-        console.log('websocket opened');
-        options.onConnect();
+        console.log('WebSocket connection established');
+        callbackFuncs.onOpen();
     };
 
     this._connection.onmessage = function (evt) {
         var data = evt.data.toString();
         //data = base64.decode(data);
-        options.onData(data);
+        callbackFuncs.onData(data);
     };
 
 
     this._connection.onclose = function (evt) {
-        options.onClose();
+        callbackFuncs.onClose();
     };
 };
 

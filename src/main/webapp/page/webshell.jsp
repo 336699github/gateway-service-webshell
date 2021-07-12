@@ -13,8 +13,8 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+  <!doctype html>
 -->
-<!doctype html>
 <html>
 <head>
     <title>WebSSH</title>
@@ -31,8 +31,9 @@
         operate:'connect',
         host: 'sandbox.hortonworks.com',
         port: '2222',
-        username: 'root',
-        password: 'Atuan871224'
+        knoxUsername: 'knox_test',
+        knoxPassword: 'knox_test',
+        username: '${username}'
     });
     function openTerminal(options){
         var client = new WSSHClient();
@@ -52,13 +53,13 @@
             client.sendClientData(data);
         });
         term.open(document.getElementById('terminal'));
-        term.write('Connecting...\r\n');
+        term.write('Connecting ' + '${username}...\r\n');
         client.connect({
             onError: function (error) {
                 term.write('Error: ' + error + '\r\n');
             },
-            onConnect: function () {
-                console.log('${username}'+'connected to websocket');
+            onOpen: function () {
+                console.log('connected to websocket');
                 client.sendInitData(options);
             },
             onClose: function () {

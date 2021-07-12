@@ -1,4 +1,4 @@
-package cn.objectspace.webssh.pojo;
+package cn.objectspace.webshell.pojo;
 
 public class UserInfo {
     private String username;

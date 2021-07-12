@@ -15,27 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webssh.pojo;
+package cn.objectspace.webshell.pojo;
 
 /**
 * data structure to store request coming from client (connect or command)
 */
-public class WebSSHData {
+public class WebShellData {
     //either connect or command
-    private String operate;
+    private String operation;
     private String host;
     //default ssh port to be used to connect to target host
     private Integer port = 22;
+    private String knoxUsername;
+    private String knoxPassword;
     private String username;
-    private String password;
     private String command = "";
 
-    public String getOperate() {
-        return operate;
+    public String getOperation() {
+        return operation;
     }
 
-    public void setOperate(String operate) {
-        this.operate = operate;
+    public void setOperation(String operation) {
+        this.operation = operation;
     }
 
     public String getHost() {
@@ -54,20 +55,27 @@ public class WebSSHData {
         this.port = port;
     }
 
+    public String getKnoxUsername() {
+        return knoxUsername;
+    }
+
+    public void setKnoxUsername(String knoxUsername) {
+        this.knoxUsername = knoxUsername;
+    }
+
+    public String getKnoxPassword() {
+        return knoxPassword;
+    }
+
+    public void setKnoxPassword(String knoxPassword) {
+        this.knoxPassword = knoxPassword;
+    }
     public String getUsername() {
         return username;
     }
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getCommand() {

@@ -15,41 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webssh.pojo;
+package cn.objectspace.webshell.service;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.JSch;
 import org.springframework.web.socket.WebSocketSession;
-/**
-* data structure to store a ssh connection session
-*/
-public class SSHConnectInfo {
-    private WebSocketSession webSocketSession;
-    private JSch jSch;
-    private Channel channel;
 
+import java.io.IOException;
 
-    public WebSocketSession getWebSocketSession() {
-        return webSocketSession;
-    }
+public interface WebShellService {
+    public void initConnection(WebSocketSession session);
 
-    public void setWebSocketSession(WebSocketSession webSocketSession) {
-        this.webSocketSession = webSocketSession;
-    }
+    /**
+     * handle data received from client
+     */
+    public void recvHandle(String buffer, WebSocketSession session);
 
-    public JSch getjSch() {
-        return jSch;
-    }
+    /**
+     * send data to frontend through websocket
+     */
+    public void sendMessageToClient(WebSocketSession session, byte[] buffer) throws IOException;
 
-    public void setjSch(JSch jSch) {
-        this.jSch = jSch;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
+    public void close(WebSocketSession session);
 }

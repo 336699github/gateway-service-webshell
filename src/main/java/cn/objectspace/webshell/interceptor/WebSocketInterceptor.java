@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webssh.interceptor;
+package cn.objectspace.webshell.interceptor;
 
-import cn.objectspace.webssh.constant.ConstantPool;
-import cn.objectspace.webssh.websocket.WebSSHWebSocketHandler;
+import cn.objectspace.webshell.constant.ConstantPool;
+import cn.objectspace.webshell.websocket.WebShellWebSocketHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
@@ -33,10 +33,9 @@ import java.util.UUID;
 public class WebSocketInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Map<String, Object> map) throws Exception {
-        Logger logger = LoggerFactory.getLogger(WebSSHWebSocketHandler.class);
-
+        Logger logger = LoggerFactory.getLogger(WebShellWebSocketHandler.class);
         if (serverHttpRequest instanceof ServletServerHttpRequest) {
-            ServletServerHttpRequest request = (ServletServerHttpRequest) serverHttpRequest;
+            // ServletServerHttpRequest request = (ServletServerHttpRequest) serverHttpRequest;
             // generate a uuid for each websocket connection
             String uuid = UUID.randomUUID().toString().replace("-","");
             //put uuid in websocket session, map can be retrieved in WebSocketHandler via session.getAttributes()
@@ -46,6 +45,8 @@ public class WebSocketInterceptor implements HandshakeInterceptor {
         } else {
             return false;
         }
+
+        //return true;
     }
 
     @Override

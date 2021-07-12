@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webssh.config;
+package cn.objectspace.webshell.config;
 
-import cn.objectspace.webssh.interceptor.WebSocketInterceptor;
-import cn.objectspace.webssh.websocket.WebSSHWebSocketHandler;
+import cn.objectspace.webshell.interceptor.WebSocketInterceptor;
+import cn.objectspace.webshell.websocket.WebShellWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -28,13 +28,13 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 @Configuration
 @EnableWebSocket
-public class WebSSHWebSocketConfig implements WebSocketConfigurer{
+public class WebShellWebSocketConfig implements WebSocketConfigurer{
     @Autowired
-    WebSSHWebSocketHandler webSSHWebSocketHandler;
+    WebShellWebSocketHandler webShellWebSocketHandler;
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
         // register WebSocketHandler for websocket connection endpoint ending with /webshellws
-        webSocketHandlerRegistry.addHandler(webSSHWebSocketHandler, "/webshellws")
+        webSocketHandlerRegistry.addHandler(webShellWebSocketHandler, "/webshellws")
                 .addInterceptors(new WebSocketInterceptor())
                 //allow websocket connection request to come from all ip addresses
                 .setAllowedOrigins("*");

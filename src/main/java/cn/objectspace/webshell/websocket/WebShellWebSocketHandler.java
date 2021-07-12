@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webssh.websocket;
+package cn.objectspace.webshell.websocket;
 
-import cn.objectspace.webssh.constant.ConstantPool;
-import cn.objectspace.webssh.service.WebSSHService;
+import cn.objectspace.webshell.constant.ConstantPool;
+import cn.objectspace.webshell.service.WebShellService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,22 +26,22 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 
 @Component
-public class WebSSHWebSocketHandler implements WebSocketHandler{
+public class WebShellWebSocketHandler implements WebSocketHandler{
     @Autowired
-    private WebSSHService webSSHService;
-    private Logger logger = LoggerFactory.getLogger(WebSSHWebSocketHandler.class);
+    private WebShellService webShellService;
+    private Logger logger = LoggerFactory.getLogger(WebShellWebSocketHandler.class);
 
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
-        logger.info("User:{},connected to web shell server", webSocketSession.getAttributes().get(ConstantPool.USER_UUID_KEY));
-        webSSHService.initConnection(webSocketSession);
+        logger.info("WebSocket session:{},connected to web shell server, websession id :{}", webSocketSession.getAttributes().get(ConstantPool.USER_UUID_KEY), webSocketSession.getId());
+        webShellService.initConnection(webSocketSession);
     }
 
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
         if (webSocketMessage instanceof TextMessage) {
             logger.info("User:{},send message:{}", webSocketSession.getAttributes().get(ConstantPool.USER_UUID_KEY), webSocketMessage.toString());
-            webSSHService.recvHandle(((TextMessage) webSocketMessage).getPayload(), webSocketSession);
+            webShellService.recvHandle(((TextMessage) webSocketMessage).getPayload(), webSocketSession);
         } else if (webSocketMessage instanceof BinaryMessage) {
 
         } else if (webSocketMessage instanceof PongMessage) {
@@ -59,7 +59,7 @@ public class WebSSHWebSocketHandler implements WebSocketHandler{
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
         logger.info("User:{} terminated web shell connection", String.valueOf(webSocketSession.getAttributes().get(ConstantPool.USER_UUID_KEY)));
-        webSSHService.close(webSocketSession);
+        webShellService.close(webSocketSession);
     }
 
     @Override
