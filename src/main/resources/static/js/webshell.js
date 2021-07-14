@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-function WSSHClient() {
+function WebShellClient() {
 };
 
-WSSHClient.prototype._generateEndpoint = function () {
+WebShellClient.prototype._generateEndpoint = function () {
     /*
     if (window.location.protocol == 'https:') {
         var protocol = 'wss://';
@@ -34,48 +34,51 @@ WSSHClient.prototype._generateEndpoint = function () {
     return endpoint;
 };
 
-WSSHClient.prototype.connect = function (callbackFuncs) {
+WebShellClient.prototype.connect = function (callbackFuncs) {
     var endpoint = this._generateEndpoint();
     console.log('generated endpoint:' + endpoint);
 
     if (window.WebSocket) {
-        //if has websocket support
         // When new WebSocket(url) is created, it starts connecting immediately
         this._connection = new WebSocket(endpoint);
     }else {
         callbackFuncs.onError('WebSocket Not Supported');
         return;
     }
-    // The WebSocket.onopen property is an event handler that is called
-    // when the WebSocket connection's readyState changes to 1;
+
     this._connection.onopen = function () {
         console.log('WebSocket connection established');
         callbackFuncs.onOpen();
     };
 
-    this._connection.onmessage = function (evt) {
-        var data = evt.data.toString();
+    this._connection.onmessage = function (event) {
+        var data = event.data.toString();
         //data = base64.decode(data);
         callbackFuncs.onData(data);
     };
 
+    this._connection.onerror = function (event) {
+        var error = event.data.toString();
+        callbackFuncs.onError(error);
+    };
 
-    this._connection.onclose = function (evt) {
+
+    this._connection.onclose = function (event) {
         callbackFuncs.onClose();
     };
 };
 
-WSSHClient.prototype.send = function (data) {
+WebShellClient.prototype.send = function (data) {
     this._connection.send(JSON.stringify(data));
 };
 
-WSSHClient.prototype.sendInitData = function (options) {
+WebShellClient.prototype.sendInitData = function (options) {
     console.log('send initializing data through websocket'+JSON.stringify(options));
     this._connection.send(JSON.stringify(options));
 }
 
-WSSHClient.prototype.sendClientData = function (data) {
-    this._connection.send(JSON.stringify({"operate": "command", "command": data}))
+WebShellClient.prototype.sendClientData = function (data) {
+    this._connection.send(JSON.stringify({"operation": "command", "command": data}))
 }
 
-var client = new WSSHClient();
+var client = new WebShellClient();

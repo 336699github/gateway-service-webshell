@@ -30,19 +30,11 @@ public class RouterController {
     @RequestMapping("/webshellui")
     public ModelAndView webshellui(@RequestParam(name="user.name") String username){
 
-        ModelAndView mav = new ModelAndView("webssh");
+        ModelAndView mav = new ModelAndView("webshell");
         mav.addObject("username", username);
 
         Logger logger = LoggerFactory.getLogger(RouterController.class);
         logger.info("user : {}",username);
         return mav;
-
-
-        /*userHttpServletRequest request, HttpServletResponse response
-        Logger logger = LoggerFactory.getLogger(RouterController.class);
-        logger.info("user : {}",username);
-        model.addAttribute("user.name", username);
-        return "webssh";
-        */
     }
 }

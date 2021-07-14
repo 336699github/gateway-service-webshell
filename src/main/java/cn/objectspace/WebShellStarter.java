@@ -21,8 +21,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WebSSHStarter {
+public class WebShellStarter {
     public static void main(String[] args) {
-        SpringApplication.run(WebSSHStarter.class);
+        SpringApplication.run(WebShellStarter.class);
     }
 }

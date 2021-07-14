@@ -19,20 +19,21 @@ package cn.objectspace.webshell.service;
 
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-
 public interface WebShellService {
-    public void initConnection(WebSocketSession session);
+    /**
+     * handle data received from client
+     */
+    void initConnection(WebSocketSession session);
 
     /**
      * handle data received from client
      */
-    public void recvHandle(String buffer, WebSocketSession session);
+    void recvHandle(String buffer, WebSocketSession session) throws Exception;
 
     /**
-     * send data to frontend through websocket
+     * helper method for recvHandle, send data to frontend through websocket
      */
-    public void sendMessageToClient(WebSocketSession session, byte[] buffer) throws IOException;
+    void sendMessageToClient(WebSocketSession session, byte[] buffer) throws Exception;
 
-    public void close(WebSocketSession session);
+    void closeConnection(WebSocketSession session) throws Exception;
 }

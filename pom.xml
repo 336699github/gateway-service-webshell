@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.objectspace</groupId>
-    <artifactId>WebSSH</artifactId>
+    <artifactId>WEBSHELL</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <parent>
@@ -67,7 +67,7 @@
     </dependencies>
     <!--打jar包主清单问题解决-->
     <build>
-        <finalName>WebSSH</finalName>
+        <finalName>WEBSHELL</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

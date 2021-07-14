@@ -24,7 +24,7 @@ spring:
   mvc:
     view:
       prefix: /page/
-      suffix: .jsp
+      suffix: .html
 
 
 

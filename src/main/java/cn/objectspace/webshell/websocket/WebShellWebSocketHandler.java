@@ -17,7 +17,6 @@
  */
 package cn.objectspace.webshell.websocket;
 
-import cn.objectspace.webshell.constant.ConstantPool;
 import cn.objectspace.webshell.service.WebShellService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,33 +32,33 @@ public class WebShellWebSocketHandler implements WebSocketHandler{
 
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
-        logger.info("WebSocket session:{},connected to web shell server, websession id :{}", webSocketSession.getAttributes().get(ConstantPool.USER_UUID_KEY), webSocketSession.getId());
+        logger.info("WebSocket session:{},connected to web shell server", webSocketSession.getId());
         webShellService.initConnection(webSocketSession);
     }
 
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
-        if (webSocketMessage instanceof TextMessage) {
-            logger.info("User:{},send message:{}", webSocketSession.getAttributes().get(ConstantPool.USER_UUID_KEY), webSocketMessage.toString());
-            webShellService.recvHandle(((TextMessage) webSocketMessage).getPayload(), webSocketSession);
-        } else if (webSocketMessage instanceof BinaryMessage) {
-
-        } else if (webSocketMessage instanceof PongMessage) {
-
-        } else {
-            logger.error("Unexpected WebSocket message type: {}",webSocketMessage);
+        try {
+            if (webSocketMessage instanceof TextMessage) {
+                webShellService.recvHandle(((TextMessage) webSocketMessage).getPayload(), webSocketSession);
+            } else {
+                throw new UnsupportedMsgTypeException("Unsupported WebSocket message type");
+            }
+        } catch (Exception e) {
+            // display error message to browser terminal, disconnect and release resources
+            webShellService.sendMessageToClient(webSocketSession, e.getMessage().getBytes());
+            webShellService.closeConnection(webSocketSession);
         }
     }
 
     @Override
-    public void handleTransportError(WebSocketSession webSocketSession, Throwable throwable) throws Exception {
-        logger.error(" WebSocket message transport error");
+    public void handleTransportError(WebSocketSession webSocketSession, Throwable e) throws Exception {
+        logger.error(" WebSocket message transport error:{}",e.getMessage());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
-        logger.info("User:{} terminated web shell connection", String.valueOf(webSocketSession.getAttributes().get(ConstantPool.USER_UUID_KEY)));
-        webShellService.close(webSocketSession);
+        webShellService.closeConnection(webSocketSession);
     }
 
     @Override

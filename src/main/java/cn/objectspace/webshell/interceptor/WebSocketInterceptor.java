@@ -33,20 +33,7 @@ import java.util.UUID;
 public class WebSocketInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Map<String, Object> map) throws Exception {
-        Logger logger = LoggerFactory.getLogger(WebShellWebSocketHandler.class);
-        if (serverHttpRequest instanceof ServletServerHttpRequest) {
-            // ServletServerHttpRequest request = (ServletServerHttpRequest) serverHttpRequest;
-            // generate a uuid for each websocket connection
-            String uuid = UUID.randomUUID().toString().replace("-","");
-            //put uuid in websocket session, map can be retrieved in WebSocketHandler via session.getAttributes()
-            map.put(ConstantPool.USER_UUID_KEY, uuid);
-            // logger.info("User:{}, at before handshake interceptor", uuid);
-            return true;
-        } else {
-            return false;
-        }
-
-        //return true;
+        return true;
     }
 
     @Override

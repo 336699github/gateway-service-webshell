@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------------
-README file for the Apache Knox Gateway Web Shell Service [UNDER CONSTRUCTION]
+README file for the Apache Knox Gateway Web Shell Application 
+[UNDER ACTIVE CONSTRUCTION]
 ------------------------------------------------------------------------------
 
 
@@ -13,29 +14,6 @@ Dependencies
 Setup
 ------------------------------------------------------------------------------
 
-- turn on websocket support in conf/gateway-site.xml 
-- make sure the following service is in conf/topology/sandbox.xml
-<service>
-   <role>WEBSHELLUI</role>
-   <url>http://localhost:4242</url>
-  </service>
-  <service>
-   <role>WEBSHELLWS</role>
-   <url>ws://localhost:4242/webshellws</url>
-  </service>
-- restart server (kill running servers then run 'ant start-test-servers')
-- start webshell server (implementation in gateway-service-webshell/)
-- use firefox to access: https://localhost:8443/gateway/sandbox/webshellui 
-(safari gives WebSocket network error: OSStatus Error -9807: Invalid certificate chain )
-6:31
-some notes:
-- i chose port 4242 to run the webshell server, if yours is in use, can change it in application.yml (also change the port in sandbox.xml)
-- right now my webshell server only works when proxied through knox, because i’ve hardcoded the websocket endpoint as ‘wss://localhost:8443/gateway/sandbox/webshellws’ (in js/webssh.js line 31) 
-- the web shell would ssh into the sandbox i have running on a local vm. but you can change to whatever you want to ssh into (in page/webssh.html line 31:35)
-6:33
-these hardcoded parts i will later modify them once we are more clear on what we wanna do
-6:35
-in addition , it does support multiple browser connections. and each with its own ssh session, but all to the same host:port
 
 ------------------------------------------------------------------------------
 Usage

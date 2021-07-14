@@ -32,7 +32,7 @@
         port: '2222',
         knoxUsername: 'knox_test',
         knoxPassword: 'knox_test',
-        username: '${username}'
+        username: 'sam'
     });
     function openTerminal(options){
         var client = new WebShellClient();
@@ -52,7 +52,7 @@
             client.sendClientData(data);
         });
         term.open(document.getElementById('terminal'));
-        term.write('Connecting ' + '${username}...\r\n');
+        term.write('Connecting ' + 'sam...\r\n');
         client.connect({
             onError: function (error) {
                 term.write('Error: ' + error + '\r\n');

@@ -21,129 +21,124 @@ import cn.objectspace.webshell.constant.ConstantPool;
 import cn.objectspace.webshell.pojo.WebShellData;
 import cn.objectspace.webshell.service.WebShellService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.JSchException;
+//import jdk.internal.util.xml.impl.Input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-
+import java.util.regex.Pattern;
 @Service
 public class WebShellServiceImpl implements WebShellService {
-    //map to store ssh connection information for each uuid
     private static final Map<String, Object> connectMap = new ConcurrentHashMap<>();
-
     private final Logger logger = LoggerFactory.getLogger(WebShellServiceImpl.class);
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Override
-    public void initConnection(WebSocketSession webSocketSession) {
-        // map a webSocketSession to a connectInfo
-        ConnectInfo connectInfo = new ConnectInfo();
+    public void initConnection(WebSocketSession webSocketSession){
+        // map a webSocketSession to a connectInfo instance
+        ConnectInfo connectInfo = new ConnectInfo(webSocketSession);
         connectMap.put(webSocketSession.getId(), connectInfo);
+
     }
 
     @Override
-    public void recvHandle(String buffer, WebSocketSession webSocketSession) {
+    public void recvHandle(String buffer, WebSocketSession webSocketSession) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        WebShellData webShellData = null;
-        try {
-            // convert received json string to WebShellData (used for ssh into host machine)
-            webShellData = objectMapper.readValue(buffer, WebShellData.class);
-            logger.info("successfully parsed json data received from client");
-        } catch (IOException e) {
-            logger.error("Json conversion error:{}", e.getMessage());
-            return;
-        }
+        WebShellData webShellData;
+        // convert received json string to WebShellData
+        webShellData = objectMapper.readValue(buffer, WebShellData.class);
+        logger.info("successfully parsed json data received from client");
+
+        ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
         if (ConstantPool.OPERATION_CONNECT.equals(webShellData.getOperation())) {
-            logger.info("received connection request,now ssh into target host");
-            ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
+            logger.info("received connection request, connecting into target host ...");
             // start asynchronous execution
-            final WebShellData finalWebSSHData = webShellData;
+            final WebShellData finalWebShellData = webShellData;
             executorService.execute(new Runnable() {
                 @Override
-                public void run() {
-                    try {
-                        connectToHost(connectInfo, finalWebSSHData, webSocketSession);
-                    } catch (JSchException | IOException | SUDOException e  ) {
-                        logger.error("Error connecting into target host:{}", e.getMessage());
-                        close(webSocketSession);
-                    }
-                }
+                public void run(){ connectToHost(finalWebShellData, connectInfo, webSocketSession);}
             });
         } else if (ConstantPool.OPERATION_COMMAND.equals(webShellData.getOperation())) {
-            String command = webShellData.getCommand();
-            ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
-            if (connectInfo != null) {
-                try {
-                    transToHost(connectInfo.getOutputStream(), command);
-                } catch (IOException e) {
-                    logger.error("Error connecting with target host:{}", e.getMessage());
-                }
-            }
+            logger.info("received command : "+ webShellData.getCommand());
+            transToHost(connectInfo.getOutputStream(), webShellData.getCommand());
         } else {
-            logger.error("Operation not supported");
-            close(webSocketSession);
+            throw new UnsupportedOpException(String.format("Operation %s not supported",webShellData.getOperation()));
         }
     }
 
     //send raw output back to client (to be parsed and displayed by xterm.js)
     @Override
-    public void sendMessageToClient(WebSocketSession session, byte[] buffer) throws IOException {
-        session.sendMessage(new TextMessage(buffer));
+    public void sendMessageToClient(WebSocketSession session, byte[] buffer) {
+        try {
+            session.sendMessage(new TextMessage(buffer));
+        } catch (Exception e) {
+            logger.error("error sending websocket message to client");
+        }
     }
 
     @Override
-    public void close(WebSocketSession session) {
-        String userId = String.valueOf(session.getAttributes().get(ConstantPool.USER_UUID_KEY));
-        ConnectInfo sshConnectInfo = (ConnectInfo) connectMap.get(userId);
-        if (sshConnectInfo != null) {
-            if (sshConnectInfo.getChannel() != null) sshConnectInfo.getChannel().disconnect();
-            connectMap.remove(userId);
-        }
+    public void closeConnection(WebSocketSession webSocketSession){
+        ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
+        connectMap.remove(webSocketSession.getId());
+        connectInfo.disconnect();
     }
 
-    /**
-     * connect to target host
-     */
-    private void connectToHost(ConnectInfo connectInfo, WebShellData webShellData, WebSocketSession webSocketSession) throws JSchException, IOException {
-        connectInfo.connect(webShellData);
-
-        try {
-            InputStream inputStream = connectInfo.getInputStream();
-            switchToUserShell(inputStream, webShellData);
-            byte[] buffer = new byte[1024];
-            int i = 0;
-            //thread blocks until data comes in
-            while ((i = inputStream.read(buffer)) != -1) {
-                sendMessageToClient(webSocketSession, Arrays.copyOfRange(buffer, 0, i));
-            }
-
-        } finally {
-            connectInfo.disconnect();
-        }
-
-    }
-
-    private void switchToUserShell(InputStream inputStream, WebShellData webShellData) throws SUDOException{
-        inputStream
-
-    }
     /**
      * transmit command to target host
      */
-    private void transToHost(OutputStream outputStream, String command) throws IOException {
-            outputStream.write(command.getBytes());
-            outputStream.flush();
+    private void transToHost (OutputStream outputStream, String command) throws Exception{
+        outputStream.write(command.getBytes());
+        outputStream.flush();
+    }
+
+    /**
+     * connect to target host, to be run asynchronously
+     */
+    private void connectToHost(WebShellData webShellData, ConnectInfo connectInfo, WebSocketSession webSocketSession){
+        try {
+            connectInfo.connect(webShellData);
+            InputStream in = connectInfo.getInputStream();
+            OutputStream out = connectInfo.getOutputStream();
+            switchToUserShell(in,out,webShellData);
+            byte[] buffer = new byte[1024];
+            int i;
+            //thread blocks until data comes in
+            while ((i = in.read(buffer)) != -1) {
+                sendMessageToClient(webSocketSession, Arrays.copyOfRange(buffer, 0, i));
+            }
+        } catch (Exception e){
+            sendMessageToClient(webSocketSession, e.getMessage().getBytes());
+            closeConnection(webSocketSession);
+        }
+    }
+
+    // switch from knox user shell to target user's shell
+    private void switchToUserShell(InputStream in, OutputStream out, WebShellData webShellData) throws Exception {
+        logger.info("start user switching... ");
+        InputStreamReader reader = new InputStreamReader( in );
+        BufferedReader bufferedReader = new BufferedReader( reader );
+
+        transToHost(out, String.format("sudo -u %s bash\ncd $HOME\n", webShellData.getUsername()));
+        //transToHost(out, String.format("sudo -u %s bash\ncd $HOME\n", "sudo-not-allowed-from-knoxtest"));
+        for (int i=0; i<5; i++) {
+            logger.info(bufferedReader.readLine());
+        }
+
+        String line = bufferedReader.readLine();
+        String targetRegex = String.format("\\[%s@[\\w-]+\\s%s\\]\\$ cd \\$HOME",webShellData.getUsername(), webShellData.getKnoxUsername());
+        logger.info("read the sixth line as :"+line);
+        logger.info("matching regex: "+targetRegex);
+        if (!line.matches(targetRegex)) {
+            throw new SUDOException("unknown user!");
+        }
     }
 }
