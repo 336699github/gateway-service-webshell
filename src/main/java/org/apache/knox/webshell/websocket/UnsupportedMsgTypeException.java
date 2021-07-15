@@ -1,4 +1,4 @@
-package cn.objectspace.webshell.websocket;
+package org.apache.knox.webshell.websocket;
 
 
 public class UnsupportedMsgTypeException extends Exception

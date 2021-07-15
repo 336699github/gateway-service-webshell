@@ -15,17 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webshell.service.impl;
+package org.apache.knox.webshell.service.impl;
 
-import cn.objectspace.webshell.pojo.WebShellData;
+import org.apache.knox.webshell.pojo.WebShellData;
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;

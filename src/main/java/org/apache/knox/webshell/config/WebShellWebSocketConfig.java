@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webshell.config;
+package org.apache.knox.webshell.config;
 
-import cn.objectspace.webshell.interceptor.WebSocketInterceptor;
-import cn.objectspace.webshell.websocket.WebShellWebSocketHandler;
+import org.apache.knox.webshell.interceptor.WebSocketInterceptor;
+import org.apache.knox.webshell.websocket.WebShellWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

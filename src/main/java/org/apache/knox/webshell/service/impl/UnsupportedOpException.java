@@ -1,4 +1,4 @@
-package cn.objectspace.webshell.service.impl;
+package org.apache.knox.webshell.service.impl;
 
 public class UnsupportedOpException extends Exception
 {

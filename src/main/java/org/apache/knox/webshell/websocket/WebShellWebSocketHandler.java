@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webshell.websocket;
+package org.apache.knox.webshell.websocket;
 
-import cn.objectspace.webshell.service.WebShellService;
+import org.apache.knox.webshell.service.WebShellService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

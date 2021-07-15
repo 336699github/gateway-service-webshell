@@ -15,26 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webshell.controller;
+package org.apache.knox.webshell.interceptor;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.servlet.ModelAndView;
-@Controller
-public class RouterController {
-    @RequestMapping("/webshellui")
-    public ModelAndView webshellui(@RequestParam(name="user.name") String username){
+public class WebSocketInterceptor implements HandshakeInterceptor {
+    @Override
+    public boolean beforeHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Map<String, Object> map) throws Exception {
+        return true;
+    }
 
-        ModelAndView mav = new ModelAndView("webshell");
-        mav.addObject("username", username);
+    @Override
+    public void afterHandshake(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse, WebSocketHandler webSocketHandler, Exception e) {
 
-        Logger logger = LoggerFactory.getLogger(RouterController.class);
-        logger.info("user : {}",username);
-        return mav;
     }
 }

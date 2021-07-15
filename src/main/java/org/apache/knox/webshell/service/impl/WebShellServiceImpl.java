@@ -15,11 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webshell.service.impl;
+package org.apache.knox.webshell.service.impl;
 
-import cn.objectspace.webshell.constant.ConstantPool;
-import cn.objectspace.webshell.pojo.WebShellData;
-import cn.objectspace.webshell.service.WebShellService;
+import org.apache.knox.webshell.constant.ConstantPool;
+import org.apache.knox.webshell.pojo.WebShellData;
+import org.apache.knox.webshell.service.WebShellService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 //import jdk.internal.util.xml.impl.Input;
 import org.slf4j.Logger;
@@ -35,7 +35,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import java.util.regex.Pattern;
 @Service
 public class WebShellServiceImpl implements WebShellService {
     private static final Map<String, Object> connectMap = new ConcurrentHashMap<>();
@@ -56,7 +55,7 @@ public class WebShellServiceImpl implements WebShellService {
         WebShellData webShellData;
         // convert received json string to WebShellData
         webShellData = objectMapper.readValue(buffer, WebShellData.class);
-        logger.info("successfully parsed json data received from client");
+        //logger.info("successfully parsed json data received from client");
 
         ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
         if (ConstantPool.OPERATION_CONNECT.equals(webShellData.getOperation())) {
@@ -65,10 +64,13 @@ public class WebShellServiceImpl implements WebShellService {
             final WebShellData finalWebShellData = webShellData;
             executorService.execute(new Runnable() {
                 @Override
-                public void run(){ connectToHost(finalWebShellData, connectInfo, webSocketSession);}
+                public void run(){
+                    connectToHost(finalWebShellData, connectInfo, webSocketSession);
+
+                }
             });
         } else if (ConstantPool.OPERATION_COMMAND.equals(webShellData.getOperation())) {
-            logger.info("received command : "+ webShellData.getCommand());
+            //logger.info("received command : "+ webShellData.getCommand());
             transToHost(connectInfo.getOutputStream(), webShellData.getCommand());
         } else {
             throw new UnsupportedOpException(String.format("Operation %s not supported",webShellData.getOperation()));
@@ -82,6 +84,7 @@ public class WebShellServiceImpl implements WebShellService {
             session.sendMessage(new TextMessage(buffer));
         } catch (Exception e) {
             logger.error("error sending websocket message to client");
+            throw new RuntimeException(e);
         }
     }
 
@@ -127,18 +130,19 @@ public class WebShellServiceImpl implements WebShellService {
         InputStreamReader reader = new InputStreamReader( in );
         BufferedReader bufferedReader = new BufferedReader( reader );
 
-        transToHost(out, String.format("sudo -u %s bash\ncd $HOME\n", webShellData.getUsername()));
+        transToHost(out, String.format("exec sudo -u %s bash\ncd $HOME\n", webShellData.getUsername()));
         //transToHost(out, String.format("sudo -u %s bash\ncd $HOME\n", "sudo-not-allowed-from-knoxtest"));
+        // todo: current implementation is not very robust against different formats of terminal output
         for (int i=0; i<5; i++) {
             logger.info(bufferedReader.readLine());
         }
-
         String line = bufferedReader.readLine();
         String targetRegex = String.format("\\[%s@[\\w-]+\\s%s\\]\\$ cd \\$HOME",webShellData.getUsername(), webShellData.getKnoxUsername());
         logger.info("read the sixth line as :"+line);
         logger.info("matching regex: "+targetRegex);
         if (!line.matches(targetRegex)) {
-            throw new SUDOException("unknown user!");
+            throw new UnknownUserException("Unknown user!");
         }
+        logger.info("successfully switched user");
     }
 }

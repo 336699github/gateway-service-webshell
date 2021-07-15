@@ -15,25 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webshell.service;
+package org.apache.knox;
 
-import org.springframework.web.socket.WebSocketSession;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-public interface WebShellService {
-    /**
-     * handle data received from client
-     */
-    void initConnection(WebSocketSession session);
-
-    /**
-     * handle data received from client
-     */
-    void recvHandle(String buffer, WebSocketSession session) throws Exception;
-
-    /**
-     * helper method for recvHandle, send data to frontend through websocket
-     */
-    void sendMessageToClient(WebSocketSession session, byte[] buffer) throws Exception;
-
-    void closeConnection(WebSocketSession session) throws Exception;
+@SpringBootApplication
+public class WebShellStarter {
+    public static void main(String[] args) {
+        SpringApplication.run(WebShellStarter.class);
+    }
 }

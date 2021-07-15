@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.objectspace.webshell.pojo;
+package org.apache.knox.webshell.pojo;
 
 /**
 * data structure to store request coming from client (connect or command)
