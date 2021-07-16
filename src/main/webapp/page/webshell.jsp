@@ -62,7 +62,7 @@
                 client.sendInitData(options);
             },
             onClose: function () {
-                term.write("\rconnection closed");
+                term.write("\r\nconnection closed");
             },
             onData: function (data) {
                 //call back when received input

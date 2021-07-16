@@ -21,7 +21,6 @@ import org.apache.knox.webshell.constant.ConstantPool;
 import org.apache.knox.webshell.pojo.WebShellData;
 import org.apache.knox.webshell.service.WebShellService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-//import jdk.internal.util.xml.impl.Input;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,7 +56,6 @@ public class WebShellServiceImpl implements WebShellService {
         webShellData = objectMapper.readValue(buffer, WebShellData.class);
         //logger.info("successfully parsed json data received from client");
 
-        ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
         if (ConstantPool.OPERATION_CONNECT.equals(webShellData.getOperation())) {
             logger.info("received connection request, connecting into target host ...");
             // start asynchronous execution
@@ -65,12 +63,11 @@ public class WebShellServiceImpl implements WebShellService {
             executorService.execute(new Runnable() {
                 @Override
                 public void run(){
-                    connectToHost(finalWebShellData, connectInfo, webSocketSession);
-
+                    connectToHost(finalWebShellData, webSocketSession);
                 }
             });
         } else if (ConstantPool.OPERATION_COMMAND.equals(webShellData.getOperation())) {
-            //logger.info("received command : "+ webShellData.getCommand());
+            ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
             transToHost(connectInfo.getOutputStream(), webShellData.getCommand());
         } else {
             throw new UnsupportedOpException(String.format("Operation %s not supported",webShellData.getOperation()));
@@ -90,9 +87,15 @@ public class WebShellServiceImpl implements WebShellService {
 
     @Override
     public void closeConnection(WebSocketSession webSocketSession){
-        ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
-        connectMap.remove(webSocketSession.getId());
-        connectInfo.disconnect();
+        if (!connectMap.containsKey(webSocketSession.getId())) return;
+        try{
+            ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
+            connectInfo.disconnect();
+            connectMap.remove(webSocketSession.getId());
+            webSocketSession.close();
+        }catch(Exception e){
+            logger.error("Error closing connection", e);
+        }
     }
 
     /**
@@ -106,8 +109,10 @@ public class WebShellServiceImpl implements WebShellService {
     /**
      * connect to target host, to be run asynchronously
      */
-    private void connectToHost(WebShellData webShellData, ConnectInfo connectInfo, WebSocketSession webSocketSession){
+    private void connectToHost(WebShellData webShellData, WebSocketSession webSocketSession){
         try {
+            ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
+            assert (connectInfo != null);
             connectInfo.connect(webShellData);
             InputStream in = connectInfo.getInputStream();
             OutputStream out = connectInfo.getOutputStream();

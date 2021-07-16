@@ -20,9 +20,7 @@ package org.apache.knox.webshell.service;
 import org.springframework.web.socket.WebSocketSession;
 
 public interface WebShellService {
-    /**
-     * handle data received from client
-     */
+
     void initConnection(WebSocketSession session);
 
     /**
@@ -31,9 +29,9 @@ public interface WebShellService {
     void recvHandle(String buffer, WebSocketSession session) throws Exception;
 
     /**
-     * helper method for recvHandle, send data to frontend through websocket
+     * send data to frontend through websocket
      */
-    void sendMessageToClient(WebSocketSession session, byte[] buffer) throws Exception;
+    void sendMessageToClient(WebSocketSession session, byte[] buffer);
 
-    void closeConnection(WebSocketSession session) throws Exception;
+    void closeConnection(WebSocketSession session);
 }

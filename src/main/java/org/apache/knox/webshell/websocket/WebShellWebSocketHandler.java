@@ -18,6 +18,7 @@
 package org.apache.knox.webshell.websocket;
 
 import org.apache.knox.webshell.service.WebShellService;
+import org.apache.knox.webshell.service.impl.ConnectInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
