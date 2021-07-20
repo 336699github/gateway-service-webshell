@@ -20,6 +20,10 @@ package org.apache.knox.webshell.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
 
 
 import org.slf4j.Logger;
@@ -28,8 +32,8 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class RouterController {
     @RequestMapping("/webshellui")
-    public ModelAndView webshellui(@RequestParam(name="user.name") String username){
-
+    public ModelAndView webshellui(HttpServletRequest request, HttpServletResponse response){
+        String username = request.getParameter("user.name");
         ModelAndView mav = new ModelAndView("webshell");
         mav.addObject("username", username);
 

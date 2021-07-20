@@ -17,15 +17,22 @@
 <html>
 <head>
     <title>WebShell</title>
-    <link rel="stylesheet" href="../css/xterm.css" />
+    <link href="../css/xterm.css" media="all" rel="stylesheet" type="text/css">
+
 </head>
 <body>
-<div id="terminal" style="width: 100%;height: 100%"></div>
 
-<script src="../js/jquery-3.4.1.min.js"></script>
-<script src="../js/xterm.js" charset="utf-8"></script>
-<script src="../js/webshell.js" charset="utf-8"></script>
+    <%=request.getParameter("user.name")%>
+<div id="terminal" style="width: 100%;height: 100%"></div>
+<script src="../js/jquery-3.4.1.min.js" ></script>
+<script type="text/javascript" src="../js/webshell.js"></script>
+<script type="text/javascript" src="../js/xterm.js"></script>
 <script>
+    const queryString = window.location.search;
+    console.log(queryString);
+    const urlParams = new URLSearchParams(queryString);
+    const username = urlParams.get('user.name')
+    console.log(username);
     openTerminal({
         operation:'connect',
         host: 'sandbox.hortonworks.com',
