@@ -131,7 +131,9 @@ public class WebShellServiceImpl implements WebShellService {
 
     // todo: current implementation is not very robust against different formats of terminal output
     // todo: needs to be modified for different os
-    private boolean switchSuccessful(BufferedReader bufferedReader, WebShellData webShellData) throws Exception{
+    private boolean switchSuccessful(InputStream in, WebShellData webShellData) throws Exception{
+        InputStreamReader reader = new InputStreamReader( in );
+        BufferedReader bufferedReader = new BufferedReader( reader );
         for (int i=0; i<5; i++) {
             logger.info(bufferedReader.readLine());
         }
@@ -145,10 +147,8 @@ public class WebShellServiceImpl implements WebShellService {
     // switch from knox user shell to target user's shell
     private void switchToUserShell(InputStream in, OutputStream out, WebShellData webShellData) throws Exception {
         logger.info("start user switching... ");
-        InputStreamReader reader = new InputStreamReader( in );
-        BufferedReader bufferedReader = new BufferedReader( reader );
         transToHost(out, String.format("exec sudo -u %s bash\ncd $HOME\n", webShellData.getUsername()));
-        if (!switchSuccessful(bufferedReader, webShellData)){
+        if (!switchSuccessful(in, webShellData)){
             throw new UnknownUserException("Unknown user!");
         };
     }
