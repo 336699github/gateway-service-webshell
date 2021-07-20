@@ -23,11 +23,11 @@ package org.apache.knox.webshell.pojo;
 public class WebShellData {
     //either connect or command
     private String operation;
-    private String host;
+    //private String host;
     //default ssh port to be used to connect to target host
-    private Integer port = 22;
-    private String knoxUsername;
-    private String knoxPassword;
+    //private Integer port = 22;
+    //private String knoxUsername;
+    //private String knoxPassword;
     private String username;
     private String command = "";
 
@@ -38,6 +38,23 @@ public class WebShellData {
     public void setOperation(String operation) {
         this.operation = operation;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public void setCommand(String command) {
+        this.command = command;
+    }
+    /*
 
     public String getHost() {
         return host;
@@ -70,19 +87,5 @@ public class WebShellData {
     public void setKnoxPassword(String knoxPassword) {
         this.knoxPassword = knoxPassword;
     }
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getCommand() {
-        return command;
-    }
-
-    public void setCommand(String command) {
-        this.command = command;
-    }
+ */
 }

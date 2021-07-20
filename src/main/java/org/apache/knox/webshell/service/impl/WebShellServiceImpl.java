@@ -129,15 +129,9 @@ public class WebShellServiceImpl implements WebShellService {
         }
     }
 
-    // switch from knox user shell to target user's shell
-    private void switchToUserShell(InputStream in, OutputStream out, WebShellData webShellData) throws Exception {
-        logger.info("start user switching... ");
-        InputStreamReader reader = new InputStreamReader( in );
-        BufferedReader bufferedReader = new BufferedReader( reader );
-
-        transToHost(out, String.format("exec sudo -u %s bash\ncd $HOME\n", webShellData.getUsername()));
-        //transToHost(out, String.format("sudo -u %s bash\ncd $HOME\n", "sudo-not-allowed-from-knoxtest"));
-        // todo: current implementation is not very robust against different formats of terminal output
+    // todo: current implementation is not very robust against different formats of terminal output
+    // todo: needs to be modified for different os
+    private boolean switchSuccessful(BufferedReader bufferedReader, WebShellData webShellData) throws Exception{
         for (int i=0; i<5; i++) {
             logger.info(bufferedReader.readLine());
         }
@@ -145,9 +139,17 @@ public class WebShellServiceImpl implements WebShellService {
         String targetRegex = String.format("\\[%s@[\\w-]+\\s%s\\]\\$ cd \\$HOME",webShellData.getUsername(), webShellData.getKnoxUsername());
         logger.info("read the sixth line as :"+line);
         logger.info("matching regex: "+targetRegex);
-        if (!line.matches(targetRegex)) {
+        return line.matches(targetRegex);
+    }
+
+    // switch from knox user shell to target user's shell
+    private void switchToUserShell(InputStream in, OutputStream out, WebShellData webShellData) throws Exception {
+        logger.info("start user switching... ");
+        InputStreamReader reader = new InputStreamReader( in );
+        BufferedReader bufferedReader = new BufferedReader( reader );
+        transToHost(out, String.format("exec sudo -u %s bash\ncd $HOME\n", webShellData.getUsername()));
+        if (!switchSuccessful(bufferedReader, webShellData)){
             throw new UnknownUserException("Unknown user!");
-        }
-        logger.info("successfully switched user");
+        };
     }
 }

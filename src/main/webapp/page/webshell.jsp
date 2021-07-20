@@ -35,11 +35,11 @@
     console.log(username);
     openTerminal({
         operation:'connect',
-        host: 'sandbox.hortonworks.com',
-        port: '2222',
-        knoxUsername: 'knox_test',
-        knoxPassword: 'knox_test',
-        username: '${username}'
+        //host: 'sandbox.hortonworks.com',
+        //port: '2222',
+        //knoxUsername: 'knox_test',
+        //knoxPassword: 'knox_test',
+        username: 'lu.liu' //${username}
     });
     function openTerminal(options){
         var client = new WebShellClient();
