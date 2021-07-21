@@ -18,87 +18,49 @@
 package org.apache.knox.webshell.service.impl;
 
 import org.apache.knox.webshell.pojo.WebShellData;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Properties;
-import org.springframework.web.socket.WebSocketSession;
 
 /**
 * data structure to store a connection session
 */
 public class ConnectInfo {
-    //private String Id;
-    //private WebSocketSession webSocketSession;
-    private final JSch jsch;
-    private Channel channel;
-    private Session jschSession;
-    private InputStream inputStream;
-    private OutputStream outputStream;
+    private InputStream in;
+    private OutputStream out;
+    private Process process;
     private Logger logger;
 
-    public ConnectInfo (WebSocketSession webSocketSession){
-        jsch = new JSch();
-        //this.Id = webSocketSession.getId();
-        //this.webSocketSession = webSocketSession;
+    public ConnectInfo (){
         logger = LoggerFactory.getLogger(ConnectInfo.class);
     }
 
-    public void connect(WebShellData webShellData) throws Exception{
-            Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
-            jschSession = jsch.getSession(webShellData.getKnoxUsername(), webShellData.getHost(), webShellData.getPort());
-            jschSession.setConfig(config);
-            jschSession.setPassword(webShellData.getKnoxPassword());
-            jschSession.connect(30000);
-            channel = jschSession.openChannel("shell");
-            inputStream = channel.getInputStream();
-            outputStream = channel.getOutputStream();
-            channel.connect(3000);
-            logger.info("successfully connected to target host using jsch");
+    public void connect() throws Exception{
+        ProcessBuilder builder = new ProcessBuilder("bash", "-i");
+        builder.redirectErrorStream(true); // so we can ignore the error stream
+        process = builder.start();
+        InputStream in = process.getInputStream();
+        OutputStream out = process.getOutputStream();
     }
-/*
-    public String getId() {
-        return Id;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
-
-
-    public WebSocketSession getWebSocketSession() {
-        return webSocketSession;
-    }
-
-    public void setWebSocketSession(WebSocketSession webSocketSession) {
-        this.webSocketSession = webSocketSession;
-    }
-
- */
 
     public InputStream getInputStream()  {
-        return this.inputStream;
+        return this.in;
     }
 
     public OutputStream getOutputStream() {
-        return this.outputStream;
+        return this.out;
     }
 
     public void disconnect(){
         try {
-            if (inputStream != null) inputStream.close();
-            if (outputStream != null) outputStream.close();
-            if (channel != null) {
-                channel.disconnect();
-                jschSession.disconnect();
+            if (in != null) in.close();
+            if (out != null) out.close();
+            if (process != null) {
+                process.destroy();
+                logger.info("process exited with value {}", process.exitValue());
             }
-            //if (webSocketSession != null) webSocketSession.close();
         } catch (Exception e) {
             logger.error("error disconnecting connectInfo");
         }

@@ -41,12 +41,6 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
         </dependency>
-        <!-- jsch支持 -->
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>0.1.54</version>
-        </dependency>
         <!-- WebSocket 支持 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -43,7 +43,7 @@ public class WebShellServiceImpl implements WebShellService {
     @Override
     public void initConnection(WebSocketSession webSocketSession){
         // map a webSocketSession to a connectInfo instance
-        ConnectInfo connectInfo = new ConnectInfo(webSocketSession);
+        ConnectInfo connectInfo = new ConnectInfo();
         connectMap.put(webSocketSession.getId(), connectInfo);
 
     }
@@ -113,7 +113,7 @@ public class WebShellServiceImpl implements WebShellService {
         try {
             ConnectInfo connectInfo = (ConnectInfo) connectMap.get(webSocketSession.getId());
             assert (connectInfo != null);
-            connectInfo.connect(webShellData);
+            connectInfo.connect();
             InputStream in = connectInfo.getInputStream();
             OutputStream out = connectInfo.getOutputStream();
             switchToUserShell(in,out,webShellData);
@@ -129,18 +129,19 @@ public class WebShellServiceImpl implements WebShellService {
         }
     }
 
-    // todo: current implementation is not very robust against different formats of terminal output
-    // todo: needs to be modified for different os
     private boolean switchSuccessful(InputStream in, WebShellData webShellData) throws Exception{
         InputStreamReader reader = new InputStreamReader( in );
         BufferedReader bufferedReader = new BufferedReader( reader );
-        for (int i=0; i<5; i++) {
+        /*
+        exec sudo -u {username} bash
+        [{username}@{hostname} knox]$ exec sudo -u {username} bash
+        cd $HOME
+         */
+        for (int i=0; i<3; i++) {
             logger.info(bufferedReader.readLine());
         }
         String line = bufferedReader.readLine();
-        String targetRegex = String.format("\\[%s@[\\w-]+\\s%s\\]\\$ cd \\$HOME",webShellData.getUsername(), webShellData.getKnoxUsername());
-        logger.info("read the sixth line as :"+line);
-        logger.info("matching regex: "+targetRegex);
+        String targetRegex = String.format("\\[%s@[\\w-]+\\s%s\\]\\$ cd \\$HOME",webShellData.getUsername(), "knox");
         return line.matches(targetRegex);
     }
 
